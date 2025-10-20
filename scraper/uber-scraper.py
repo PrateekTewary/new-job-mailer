@@ -1,6 +1,6 @@
 import requests
 
-def fetch_uber_jobs(limit=100, page=0):
+def fetch_uber_jobs(limit=10, page=0):
     """
     Fetch Uber job listings for selected Indian cities.
 
@@ -32,17 +32,20 @@ def fetch_uber_jobs(limit=100, page=0):
         response = requests.post(url, headers=headers, json=body)
         response.raise_for_status()
         data = response.json()
-        print(data)
+        # print(data.get("data", {}))
 
         results = []
-        # for job in data.get("data", {}).get("list", []):
-        #     results.append({
-        #         "id": job.get("id"),5
-        #         "title": job.get("title"),
-        #         "location": job.get("city"),
-        #         "team": job.get("department"),
-        #         "url": f"https://www.uber.com/global/en/careers/list/{job.get('id')}/"
-        #     })
+        for job in data.get("data", {}).get("results", []):
+            results.append({
+                "id": job.get("id"),
+                "title": job.get("title"),
+                "location": job.get("city"),
+                "team": job.get("department"),
+                "url": f"https://www.uber.com/global/en/careers/list/{job.get('id')}/"
+            })
+        
+        # print(f"Results in fetch_uber_jobs - {results}")
+
         return results
 
     except Exception as e:
@@ -52,7 +55,8 @@ def fetch_uber_jobs(limit=100, page=0):
 
 if __name__ == "__main__":
     jobs = fetch_uber_jobs()
-    print(f"Fetched {len(jobs)} Uber jobs.")
-    for job in jobs[:5]:  # show first 5
+    # print(f"Fetched {jobs} Uber jobs.")
+    for job in jobs:  # show first 5
         print(f"{job['title']} - {job['location']} ({job['team']})")
         print(job['url'])
+        print("\n\n")
